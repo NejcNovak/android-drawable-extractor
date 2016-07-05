@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, makedirs
 from os.path import isfile, join, exists, isdir
 from Tkinter import *
 from tkFileDialog import askdirectory
@@ -17,6 +17,7 @@ class MyCheckButton(Checkbutton):
 
 class Window:
     frame_padding = 10
+    view_padding = 15
 
     def __init__(self, master):
         self.folder = ""
@@ -37,7 +38,7 @@ class Window:
         self.folder_name_input = Entry(self.folder_select_frame)
         self.browse_folder_button = Button(self.folder_select_frame, text='Browse', command=self.browse_folder)
         self.select_button = Button(self.folder_select_frame, text='Select', command=self.check_folder)
-        self.folder_label = Label(self.folder_select_frame, text='Module Folder')
+        self.folder_label = Label(self.folder_select_frame, text='Parent Folder')
         self.setup_folder_select_frame()
 
         # FILE SELECT FRAME
@@ -80,8 +81,8 @@ class Window:
         self.use_file_button.pack(side=LEFT)
 
     def setup_checkbutton_frame(self):
-        self.checkbutton_label.pack(side=TOP, pady=self.frame_padding)
-        self.clear_all.pack(side=BOTTOM, pady=self.frame_padding)
+        self.checkbutton_label.pack(side=TOP, pady=self.view_padding)
+        self.clear_all.pack(side=BOTTOM, pady=self.view_padding)
         self.vsb.config(command=self.text.yview)
         self.vsb.pack(side=RIGHT, fill=Y)
         self.text.pack(side=LEFT, fill=BOTH, expand=True)
@@ -133,21 +134,41 @@ class Window:
             self.text.window_create("end", window=check)
             self.text.insert("end", "\n")  # force one checkbox per line
 
-    def extract(self):
-        output_name = self.output_folder_name_input.get()
-        for i, checkbutton in enumerate(self.checkbuttons):
-            print checkbutton.is_checked()
-
-    def clear_all(self):
-        for c in self.checkbuttons:
-            c.deselect()
-
     def check_from_file(self, filename):
         with open(filename) as f:
             for line in f:
                 line = line.replace("\n", "")
                 if line in self.drawables:
                     self.checkbuttons[self.drawables.index(line)].select()
+
+    def clear_all(self):
+        for c in self.checkbuttons:
+            c.deselect()
+
+    def extract(self):
+        output_name = self.folder + '/' + self.output_folder_name_input.get()
+        self.create_folders(output_name)
+        for i, checkbutton in enumerate(self.checkbuttons):
+            print checkbutton.is_checked()
+
+    def create_folders(self, parent_folder_name):
+        self.create_parent_folder(parent_folder_name)
+        makedirs(parent_folder_name + '/drawable-mdpi')
+        makedirs(parent_folder_name + '/drawable-hdpi')
+        makedirs(parent_folder_name + '/drawable-xdpi')
+        makedirs(parent_folder_name + '/drawable-xxdpi')
+        makedirs(parent_folder_name + '/drawable-xxxdpi')
+
+    def create_parent_folder(self, folder_name):
+        copy_number = 0
+        success = False
+        while not success:
+            if not exists(folder_name):
+                makedirs(folder_name)
+                success = True
+            else:
+                folder_name = folder_name + "_" + copy_number
+                copy_number += 1
 
 
 root = Tk()
