@@ -42,13 +42,14 @@ class Window:
 
         # FILE SELECT FRAME
         self.file_helper_text = Label(self.file_select_frame,
-                                      text='Select the file containing the drawable names that you want to check')
+                                      text='Select the file containing the names of drawables you wish to export')
         self.file_label = Label(self.file_select_frame, text="Selector File")
         self.file_name_input = Entry(self.file_select_frame)
         self.browse_file_button = Button(self.file_select_frame, text="Browse", command=self.browse_file)
         self.use_file_button = Button(self.file_select_frame, text="Use File", command=self.check_file)
 
         # CHECKBUTTON FRAME
+        self.checkbutton_label = Label(self.checkbutton_frame, text="Select the drawables you wish to export")
         self.vsb = Scrollbar(self.checkbutton_frame, orient="vertical")
         self.text = Text(self.checkbutton_frame, width=40, height=20, yscrollcommand=self.vsb.set)
         self.clear_all = Button(self.checkbutton_frame, text="Clear All", command=self.clear_all)
@@ -61,24 +62,25 @@ class Window:
     def setup_frames(self):
         self.folder_select_frame.pack(fill=X, pady=self.frame_padding, padx=self.frame_padding)
         self.file_select_frame.pack(fill=X, pady=self.frame_padding, padx=self.frame_padding)
-        self.checkbutton_frame.pack(fill=X, pady=self.frame_padding, padx=self.frame_padding)
+        self.checkbutton_frame.pack(fill=X)  # padding is in top and bottom child
         self.footer_frame.pack(fill=X, pady=self.frame_padding, padx=self.frame_padding)
 
     def setup_folder_select_frame(self):
-        self.folder_help_text.pack()
+        self.folder_help_text.pack(side=TOP)
         self.folder_label.pack(side=LEFT)
         self.folder_name_input.pack(side=LEFT)
         self.browse_folder_button.pack(side=LEFT)
         self.select_button.pack(side=LEFT)
 
     def setup_file_selector_frame(self):
-        self.file_helper_text.pack()
+        self.file_helper_text.pack(side=TOP)
         self.file_label.pack(side=LEFT)
         self.file_name_input.pack(side=LEFT)
         self.browse_file_button.pack(side=LEFT)
         self.use_file_button.pack(side=LEFT)
 
     def setup_checkbutton_frame(self):
+        self.checkbutton_label.pack(side=TOP, pady=self.frame_padding)
         self.clear_all.pack(side=BOTTOM, pady=self.frame_padding)
         self.vsb.config(command=self.text.yview)
         self.vsb.pack(side=RIGHT, fill=Y)
@@ -129,7 +131,7 @@ class Window:
             self.checkbuttons.append(check)
             self.drawables.append(drawable.split(".")[0])
             self.text.window_create("end", window=check)
-            self.text.insert("end", "\n")  # to force one checkbox per line
+            self.text.insert("end", "\n")  # force one checkbox per line
 
     def extract(self):
         output_name = self.output_folder_name_input.get()
