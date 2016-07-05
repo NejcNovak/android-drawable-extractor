@@ -152,7 +152,7 @@ class Window:
             print checkbutton.is_checked()
 
     def create_folders(self, parent_folder_name):
-        self.create_parent_folder(parent_folder_name)
+        parent_folder_name = self.create_parent_folder(parent_folder_name)
         makedirs(parent_folder_name + '/drawable-mdpi')
         makedirs(parent_folder_name + '/drawable-hdpi')
         makedirs(parent_folder_name + '/drawable-xdpi')
@@ -160,14 +160,14 @@ class Window:
         makedirs(parent_folder_name + '/drawable-xxxdpi')
 
     def create_parent_folder(self, folder_name):
-        copy_number = 0
-        success = False
-        while not success:
-            if not exists(folder_name):
-                makedirs(folder_name)
-                success = True
+        folder_copy_name = folder_name
+        copy_number = 1
+        while True:
+            if not exists(folder_copy_name):
+                makedirs(folder_copy_name)
+                return folder_copy_name
             else:
-                folder_name = folder_name + "_" + str(copy_number)
+                folder_copy_name = folder_name + '_' + str(copy_number)
                 copy_number += 1
 
 
