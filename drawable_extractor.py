@@ -1,27 +1,35 @@
 from os import listdir, makedirs
 from os.path import isfile, join, exists, isdir
+from shutil import copyfile
 from Tkinter import *
 from tkFileDialog import askdirectory
 from tkFileDialog import askopenfilename
 
 
 class MyCheckButton(Checkbutton):
-    def __init__(self,*args,**kwargs):
-        self.var=kwargs.get('variable',IntVar())
-        kwargs['variable']=self.var
-        Checkbutton.__init__(self,*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        self.var = kwargs.get('variable', IntVar())
+        self.text = kwargs.get('text', StringVar())
+        kwargs['variable'] = self.var
+        kwargs['text'] = self.text
+        Checkbutton.__init__(self, *args, **kwargs)
 
     def is_checked(self):
         return self.var.get()
+
+    def get_text(self):
+        return self.text
 
 
 class Window:
     frame_padding = 10
     view_padding = 15
+    drawable_dirs = ['/drawable-mdpi/', '/drawable-hdpi/', '/drawable-xhdpi/', '/drawable-xxhdpi/', '/drawable-xxxhdpi/']
 
     def __init__(self, master):
         self.folder = ""
         self.file = ""
+        self.parent_folder_name = ""
         self.drawables = []
         self.checkbuttons = []
 
@@ -149,15 +157,13 @@ class Window:
         output_name = self.folder + '/' + self.output_folder_name_input.get()
         self.create_folders(output_name)
         for i, checkbutton in enumerate(self.checkbuttons):
-            print checkbutton.is_checked()
+            if checkbutton.is_checked():
+                self.copy_files(checkbutton.get_text())
 
     def create_folders(self, parent_folder_name):
-        parent_folder_name = self.create_parent_folder(parent_folder_name)
-        makedirs(parent_folder_name + '/drawable-mdpi')
-        makedirs(parent_folder_name + '/drawable-hdpi')
-        makedirs(parent_folder_name + '/drawable-xdpi')
-        makedirs(parent_folder_name + '/drawable-xxdpi')
-        makedirs(parent_folder_name + '/drawable-xxxdpi')
+        self.parent_folder_name = self.create_parent_folder(parent_folder_name)
+        for density in self.drawable_dirs:
+            makedirs(self.parent_folder_name + density)
 
     def create_parent_folder(self, folder_name):
         folder_copy_name = folder_name
@@ -169,6 +175,12 @@ class Window:
             else:
                 folder_copy_name = folder_name + '_' + str(copy_number)
                 copy_number += 1
+
+    def copy_files(self, text):
+        for density in self.drawable_dirs:
+            if exists(self.folder + density + text):
+                copyfile(self.folder + density + text, self.parent_folder_name + density + text)
+
 
 
 root = Tk()
