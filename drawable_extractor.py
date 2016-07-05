@@ -167,7 +167,7 @@ class Window:
                 makedirs(folder_name)
                 success = True
             else:
-                folder_name = folder_name + "_" + copy_number
+                folder_name = folder_name + "_" + str(copy_number)
                 copy_number += 1
 
 
