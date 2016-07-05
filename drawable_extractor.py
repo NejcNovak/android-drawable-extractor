@@ -22,7 +22,7 @@ class Window:
         self.folder = ""
         self.file = ""
         self.drawables = []
-        self.checkboxes = []
+        self.checkbuttons = []
 
         # FRAMES
         self.folder_select_frame = Frame(root)
@@ -51,9 +51,11 @@ class Window:
         # CHECKBUTTON FRAME
         self.vsb = Scrollbar(self.checkbutton_frame, orient="vertical")
         self.text = Text(self.checkbutton_frame, width=40, height=20, yscrollcommand=self.vsb.set)
+        self.clear_all = Button(self.checkbutton_frame, text="Clear All", command=self.clear_all)
 
         # FOOTER FRAME
-        self.clear_all = Button(self.footer_frame, text="Clear All", command=self.clear_all)
+        self.output_folder_label = Label(self.footer_frame, text="Output Folder Name")
+        self.output_folder_name_input = Entry(self.footer_frame)
         self.extract_button = Button(self.footer_frame, text="Extract Drawables", command=self.extract)
 
     def setup_frames(self):
@@ -77,13 +79,15 @@ class Window:
         self.use_file_button.pack(side=LEFT)
 
     def setup_checkbutton_frame(self):
+        self.clear_all.pack(side=BOTTOM, pady=self.frame_padding)
         self.vsb.config(command=self.text.yview)
-        self.vsb.pack(side="right", fill="y")
-        self.text.pack(side="left", fill="both", expand=True)
+        self.vsb.pack(side=RIGHT, fill=Y)
+        self.text.pack(side=LEFT, fill=BOTH, expand=True)
 
     def setup_footer_frame(self):
-        self.clear_all.pack()
-        self.extract_button.pack()
+        self.output_folder_label.pack(side=LEFT)
+        self.output_folder_name_input.pack(side=LEFT)
+        self.extract_button.pack(side=LEFT)
 
     def browse_folder(self):
         Tk().withdraw()
@@ -122,25 +126,26 @@ class Window:
 
         for i, drawable in enumerate(all_files):
             check = MyCheckButton(self.checkbutton_frame, text=drawable)
-            self.checkboxes.append(check)
+            self.checkbuttons.append(check)
             self.drawables.append(drawable.split(".")[0])
             self.text.window_create("end", window=check)
             self.text.insert("end", "\n")  # to force one checkbox per line
 
     def extract(self):
-        for i, c in enumerate(self.checkboxes):
-            print c.is_checked()
+        output_name = self.output_folder_name_input.get()
+        for i, checkbutton in enumerate(self.checkbuttons):
+            print checkbutton.is_checked()
 
     def clear_all(self):
-        for c in self.checkboxes:
+        for c in self.checkbuttons:
             c.deselect()
 
-    def check_from_file(self, file):
-        with open(file) as f:
+    def check_from_file(self, filename):
+        with open(filename) as f:
             for line in f:
                 line = line.replace("\n", "")
                 if line in self.drawables:
-                    self.checkboxes[self.drawables.index(line)].select()
+                    self.checkbuttons[self.drawables.index(line)].select()
 
 
 root = Tk()
